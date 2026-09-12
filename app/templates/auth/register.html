@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Register — SmartBill Split{% endblock %}
+{% block guest_content %}
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-logo"><span style="width:10px;height:10px;border-radius:3px;background:var(--accent);display:inline-block;transform:rotate(45deg);"></span> Create your account</div>
+    <div class="auth-sub">Takes less than a minute.</div>
+    <form method="POST">
+      <label>Full name</label>
+      <input type="text" name="name" required placeholder="Jordan Lee">
+      <label>Email address</label>
+      <input type="email" name="email" required placeholder="you@example.com">
+      <label>Password</label>
+      <input type="password" name="password" required placeholder="At least 8 characters">
+      <label>Confirm password</label>
+      <input type="password" name="confirm" required placeholder="Repeat password">
+      <button type="submit" class="btn btn-primary btn-block mt-3">Create account</button>
+    </form>
+    <p class="muted" style="margin-top:18px; font-size:0.85rem;">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

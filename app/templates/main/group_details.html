@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }} — SmartBill Split{% endblock %}
+{% block content %}
+<div class="flex-between">
+  <div>
+    <h2>{{ group.name }}</h2>
+    <p class="muted" style="margin-top:-10px;">{{ group.description or "No description" }}</p>
+  </div>
+  <a href="{{ url_for('main.add_bill', group_id=group.id) }}" class="btn btn-primary">➕ Add bill</a>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;" class="mt-3">
+  <div class="card">
+    <h3>Members ({{ members|length }})</h3>
+    {% for m in members %}
+    <div class="member-row">
+      <div class="avatar">{{ m.name[:1] }}</div>
+      <div style="flex:1;">
+        <div>{{ m.name }}</div>
+        <div class="muted" style="font-size:0.78rem;">
+          {% if net_balances.get(m.id, 0) > 0.01 %}
+            <span style="color:var(--mint);">is owed ₹{{ "%.2f"|format(net_balances.get(m.id)) }}</span>
+          {% elif net_balances.get(m.id, 0) < -0.01 %}
+            <span style="color:var(--coral);">owes ₹{{ "%.2f"|format(-net_balances.get(m.id)) }}</span>
+          {% else %}settled up{% endif %}
+        </div>
+      </div>
+      {% if m.id != current_user.id and net_balances.get(m.id, 0) < -0.01 %}
+      <form method="POST" action="{{ url_for('main.send_reminder', group_id=group.id, user_id=m.id) }}">
+        <button class="btn btn-outline btn-sm" type="submit">🔔 Remind</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <form method="POST" action="{{ url_for('main.add_group_member', group_id=group.id) }}" class="mt-3">
+      <label>Add member (email or phone)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" name="identifier" placeholder="friend@email.com" required>
+        <button class="btn btn-outline" type="submit">Add</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Who owes whom</h3>
+    {% if transactions %}
+      {% for t in transactions %}
+      <div class="member-row">
+        <div style="flex:1;">
+          <strong>{{ member_lookup[t.from].name }}</strong> owes <strong>{{ member_lookup[t.to].name }}</strong>
+        </div>
+        <div style="color:var(--coral); font-weight:600;">₹{{ "%.2f"|format(t.amount) }}</div>
+        {% if t.from == current_user.id %}
+        <a class="btn btn-mint btn-sm" href="#" onclick="alert('Open the specific bill below to pay this share.')">Pay</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="muted">Everyone is settled up! 🎉</p>
+    {% endif %}
+  </div>
+</div>
+
+<h3 class="mt-3">Bills in this group</h3>
+{% if bills %}
+<div class="card" style="padding:0;">
+  <table class="table">
+    <tr><th>Bill</th><th>Category</th><th>Amount</th><th>Paid by</th><th>Split</th><th>Date</th><th>Status</th></tr>
+    {% for b in bills %}
+    <tr>
+      <td>{{ b.name }}</td>
+      <td>{{ b.category.icon if b.category else '' }} {{ b.category.name if b.category else '—' }}</td>
+      <td>₹{{ "%.2f"|format(b.total_amount) }}</td>
+      <td>{{ b.paid_by.name }}</td>
+      <td style="text-transform:capitalize;">{{ b.split_type }}</td>
+      <td>{{ b.bill_date }}</td>
+      <td>
+        {% if b.is_fully_settled() %}<span class="pill pill-paid">Settled</span>
+        {% else %}<span class="pill pill-pending">Pending</span>{% endif %}
+      </td>
+    </tr>
+    {% for s in b.shares %}
+      {% if s.user_id == current_user.id and not s.is_paid and b.paid_by_id != current_user.id %}
+      <tr>
+        <td colspan="6" class="muted">Your share: ₹{{ "%.2f"|format(s.amount) }}</td>
+        <td><a class="btn btn-mint btn-sm" href="{{ url_for('main.pay_bill_share', bill_id=b.id, share_user_id=current_user.id) }}">Pay now</a></td>
+      </tr>
+      {% endif %}
+    {% endfor %}
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+<div class="card muted">No bills yet. <a href="{{ url_for('main.add_bill', group_id=group.id) }}">Add the first one</a>.</div>
+{% endif %}
+{% endblock %}

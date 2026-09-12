@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Phone login — SmartBill Split{% endblock %}
+{% block guest_content %}
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-logo">📱 Phone login</div>
+    <div class="auth-sub">We'll text you a one-time code — every time you log in, for your security.</div>
+    <form method="POST">
+      <label>Phone number</label>
+      <input type="tel" name="phone" required placeholder="+91 98765 43210" autofocus>
+      <button type="submit" class="btn btn-primary btn-block mt-3">Send OTP</button>
+    </form>
+    <p class="muted" style="margin-top:18px; font-size:0.85rem;">
+      <a href="{{ url_for('auth.login') }}">← Back to login options</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Manage Users — Admin{% endblock %}
+{% block content %}
+<h2>All users</h2>
+<div class="card" style="padding:0;">
+  <table class="table">
+    <tr><th>Name</th><th>Email</th><th>Provider</th><th>Joined</th><th>Status</th><th></th></tr>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.name }}</td>
+      <td>{{ u.email or '—' }}</td>
+      <td style="text-transform:capitalize;">{{ u.auth_provider }}</td>
+      <td>{{ u.created_at.strftime('%d %b %Y') }}</td>
+      <td>
+        {% if u.is_active_account %}<span class="pill pill-paid">Active</span>{% else %}<span class="pill pill-owe">Deactivated</span>{% endif %}
+      </td>
+      <td style="display:flex; gap:6px;">
+        <form method="POST" action="{{ url_for('admin.deactivate_user', user_id=u.id) }}">
+          <button class="btn btn-outline btn-sm" type="submit">{{ 'Reactivate' if not u.is_active_account else 'Deactivate' }}</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.delete_user', user_id=u.id) }}" onsubmit="return confirm('Delete this account permanently?');">
+          <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}All Groups — Admin{% endblock %}
+{% block content %}
+<h2>All groups</h2>
+<div class="card" style="padding:0;">
+  <table class="table">
+    <tr><th>Group</th><th>Members</th><th>Bills</th><th>Created</th></tr>
+    {% for g in groups %}
+    <tr>
+      <td>{{ g.name }}</td>
+      <td>{{ g.members|length }}</td>
+      <td>{{ g.bills|length }}</td>
+      <td>{{ g.created_at.strftime('%d %b %Y') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

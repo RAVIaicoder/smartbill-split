@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Notifications — SmartBill Split{% endblock %}
+{% block content %}
+<h2>Notifications</h2>
+<div class="card" style="padding:0;">
+  {% for n in notifications %}
+  <div class="member-row" style="padding:14px 18px;">
+    <div style="flex:1;">
+      {{ n.message }}
+      <div class="muted" style="font-size:0.75rem;">{{ n.created_at.strftime('%d %b %Y, %H:%M') }}</div>
+    </div>
+    {% if n.link %}<a href="{{ n.link }}" class="btn btn-outline btn-sm">View</a>{% endif %}
+  </div>
+  {% else %}
+  <div class="muted" style="padding:18px;">No notifications yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}

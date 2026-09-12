@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Profile — SmartBill Split{% endblock %}
+{% block content %}
+<h2>Your profile</h2>
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+  <div class="card">
+    <h3>Edit details</h3>
+    <form method="POST">
+      <label>Full name</label>
+      <input type="text" name="name" value="{{ current_user.name }}">
+      <label>Email</label>
+      <input type="email" name="email" value="{{ current_user.email or '' }}" placeholder="Add an email">
+      <label>Phone</label>
+      <input type="text" name="phone" value="{{ current_user.phone or '' }}" placeholder="Add a phone number">
+      <button type="submit" class="btn btn-primary mt-3">Save changes</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Account overview</h3>
+    <table class="table">
+      <tr><td>Sign-in method</td><td style="text-transform:capitalize;">{{ current_user.auth_provider }}</td></tr>
+      <tr><td>Member since</td><td>{{ current_user.created_at.strftime('%d %b %Y') }}</td></tr>
+      <tr><td>Groups joined</td><td>{{ current_user.groups_count() }}</td></tr>
+      <tr><td>Pending bills</td><td>{{ current_user.pending_bills_count() }}</td></tr>
+    </table>
+  </div>
+</div>
+{% endblock %}

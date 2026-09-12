@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Pay {{ bill.name }} — SmartBill Split{% endblock %}
+{% block content %}
+<h2>Pay your share</h2>
+
+<div class="card" style="max-width:480px;">
+  <div class="flex-between">
+    <div>
+      <div class="muted" style="font-size:0.85rem;">{{ bill.name }} · {{ bill.group.name }}</div>
+      <div style="font-family:var(--font-display); font-size:2rem; font-weight:700;">₹{{ "%.2f"|format(share.amount) }}</div>
+    </div>
+    <div class="muted">to {{ bill.paid_by.name }}</div>
+  </div>
+
+  <div id="qr-code" style="display:flex; justify-content:center; margin: 20px 0;"></div>
+
+  <form method="POST">
+    <p class="muted" style="font-size:0.85rem;">Choose how you'd like to pay:</p>
+    <div class="upi-btn-row">
+      <button class="btn btn-mint" type="submit" name="method" value="gpay">📲 Google Pay</button>
+      <button class="btn btn-mint" type="submit" name="method" value="phonepe">📲 PhonePe</button>
+    </div>
+    <div class="upi-btn-row">
+      <button class="btn btn-outline" type="submit" name="method" value="credit_card">💳 Credit Card</button>
+      <button class="btn btn-outline" type="submit" name="method" value="debit_card">💳 Debit Card</button>
+    </div>
+    <div class="upi-btn-row">
+      <button class="btn btn-outline btn-block" type="submit" name="method" value="upi">🔗 Any UPI app</button>
+    </div>
+  </form>
+
+  {% if not razorpay_info.configured %}
+  <p class="muted" style="font-size:0.78rem; margin-top:14px;">ℹ️ {{ razorpay_info.message }}</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  new QRCode(document.getElementById("qr-code"), {
+    text: {{ upi_link|tojson }},
+    width: 160, height: 160,
+  });
+</script>
+{% endblock %}

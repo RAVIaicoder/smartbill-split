@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Payment — SmartBill Split{% endblock %}
+{% block content %}
+<div class="card" style="max-width:460px;">
+  <h2>Completing payment</h2>
+  <p class="muted">₹{{ "%.2f"|format(payment.amount) }} via {{ payment.method.replace('_',' ').title() }}</p>
+
+  {% if payment.method in ['upi','gpay','phonepe'] %}
+    <p>Tap below to open your UPI app and complete the payment:</p>
+    <a class="btn btn-mint btn-block" href="{{ payment.upi_link }}">Open UPI app</a>
+    <p class="muted" style="font-size:0.78rem; margin-top:10px;">
+      This link opens Google Pay, PhonePe, Paytm, or any UPI app installed on your device.
+      SmartBill never sees your UPI PIN or bank details.
+    </p>
+  {% else %}
+    <p class="muted">Card payment would be handled by a payment gateway (Razorpay/Cashfree/PayU) checkout here — not implemented in this demo build.</p>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('main.confirm_payment', payment_id=payment.id) }}" class="mt-3">
+    <button class="btn btn-primary btn-block" type="submit">I've completed the payment</button>
+  </form>
+  <p class="muted" style="font-size:0.75rem; margin-top:10px;">
+    In production this confirmation comes automatically from the payment gateway's webhook, not a manual click.
+  </p>
+</div>
+{% endblock %}

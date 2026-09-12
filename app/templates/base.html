@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ 'dark' if (current_user.is_authenticated and current_user.dark_mode) else ('dark' if not current_user.is_authenticated else 'light') }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SmartBill Split{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="dot"></span> SmartBill</div>
+    <nav class="nav-group">
+      <a class="nav-link {{ 'active' if request.endpoint == 'main.dashboard' }}" href="{{ url_for('main.dashboard') }}">📊 Dashboard</a>
+      <a class="nav-link {{ 'active' if request.endpoint == 'main.create_group' }}" href="{{ url_for('main.create_group') }}">➕ Create Group</a>
+      <a class="nav-link {{ 'active' if request.endpoint == 'main.bill_history' }}" href="{{ url_for('main.bill_history') }}">🧾 Bill History</a>
+      <a class="nav-link {{ 'active' if request.endpoint == 'main.reports' }}" href="{{ url_for('main.reports') }}">📈 Reports</a>
+      <a class="nav-link {{ 'active' if request.endpoint == 'main.notifications' }}" href="{{ url_for('main.notifications') }}">🔔 Notifications
+        <span id="notif-badge" class="badge-dot" style="{{ '' if unread_count else 'display:none;' }}">{{ unread_count or '' }}</span>
+      </a>
+      <div class="nav-label">Your groups</div>
+      {% for gm in current_user.memberships %}
+        <a class="nav-link {{ 'active' if request.view_args and request.view_args.get('group_id') == gm.group.id }}" href="{{ url_for('main.group_details', group_id=gm.group.id) }}">🗂️ {{ gm.group.name }}</a>
+      {% else %}
+        <span class="muted" style="padding-left:10px; font-size:0.82rem;">No groups yet</span>
+      {% endfor %}
+      <div class="nav-label">Account</div>
+      <a class="nav-link {{ 'active' if request.endpoint == 'main.profile' }}" href="{{ url_for('main.profile') }}">👤 Profile</a>
+      <a class="nav-link {{ 'active' if request.endpoint == 'main.settings' }}" href="{{ url_for('main.settings') }}">⚙️ Settings</a>
+      {% if current_user.is_admin %}
+        <a class="nav-link {{ 'active' if request.blueprint == 'admin' }}" href="{{ url_for('admin.dashboard') }}">🛡️ Admin</a>
+      {% endif %}
+      <a class="nav-link" href="{{ url_for('auth.logout') }}">🚪 Logout</a>
+    </nav>
+  </aside>
+  <main class="main-content">
+    <div class="topbar">
+      <div></div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="icon-btn" id="theme-toggle" title="Toggle dark mode">🌙</button>
+        <div class="avatar">{{ current_user.name[:1] }}</div>
+      </div>
+    </div>
+    {% include "_flashes.html" %}
+    {% block content %}{% endblock %}
+  </main>
+  <div id="toast-stack" aria-live="polite"></div>
+</div>
+{% else %}
+  {% include "_flashes.html" %}
+  {% block guest_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% if current_user.is_authenticated %}
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof io === "undefined") return;
+    const socket = io();
+
+    socket.on("new_notification", (data) => {
+      // 1. bump the sidebar badge count
+      const badge = document.getElementById("notif-badge");
+      if (badge) {
+        const current = parseInt(badge.textContent, 10) || 0;
+        badge.textContent = current + 1;
+        badge.style.display = "";
+      }
+      // 2. pop a toast in the corner
+      const stack = document.getElementById("toast-stack");
+      if (stack) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerHTML = `🔔 ${data.message}`;
+        if (data.link) toast.onclick = () => { window.location.href = data.link; };
+        stack.appendChild(toast);
+        setTimeout(() => toast.classList.add("show"), 10);
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => toast.remove(), 300);
+        }, 6000);
+      }
+    });
+  });
+</script>
+{% endif %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Create Group — SmartBill Split{% endblock %}
+{% block content %}
+<h2>Create a new group</h2>
+<p class="muted" style="margin-top:-8px;">Groups can be a trip, flatmates, an event — anything you split costs for.</p>
+
+<div class="card" style="max-width:520px;">
+  <form method="POST">
+    <label>Group name</label>
+    <input type="text" name="name" required placeholder="Goa Trip 2026">
+    <label>Description (optional)</label>
+    <input type="text" name="description" placeholder="Weekend getaway with the gang">
+    <label>Add members by email or phone (comma-separated)</label>
+    <input type="text" name="members" placeholder="alex@email.com, +919876543210">
+    <p class="muted" style="font-size:0.8rem;">Members must already have a SmartBill account. You can add more later from the group page.</p>
+    <button type="submit" class="btn btn-primary btn-block mt-3">Create group</button>
+  </form>
+</div>
+{% endblock %}

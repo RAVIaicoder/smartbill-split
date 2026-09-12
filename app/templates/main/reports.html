@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Reports — SmartBill Split{% endblock %}
+{% block content %}
+<h2>Expense reports</h2>
+<p class="muted" style="margin-top:-8px;">Total tracked across all your groups: <strong>₹{{ total_expenses }}</strong></p>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;" class="mt-3">
+  <div class="card">
+    <h3>By category</h3>
+    <canvas id="catChart" height="220"></canvas>
+  </div>
+  <div class="card">
+    <h3>Monthly trend</h3>
+    <canvas id="monthChart" height="220"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const catCtx = document.getElementById('catChart');
+new Chart(catCtx, {
+  type: 'doughnut',
+  data: {
+    labels: {{ category_labels|tojson }},
+    datasets: [{ data: {{ category_values|tojson }}, backgroundColor: ['#4C7EFF','#22D3A5','#F5B942','#FF6B6B','#8B93A7','#9b6bff','#2fb8c9'] }]
+  },
+  options: { plugins: { legend: { labels: { color: getComputedStyle(document.body).color } } } }
+});
+
+const monthCtx = document.getElementById('monthChart');
+new Chart(monthCtx, {
+  type: 'line',
+  data: {
+    labels: {{ month_labels|tojson }},
+    datasets: [{ label: 'Expenses (₹)', data: {{ month_values|tojson }}, borderColor: '#4C7EFF', backgroundColor: 'rgba(76,126,255,0.15)', fill: true, tension: 0.3 }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8B93A7' } }, y: { ticks: { color: '#8B93A7' } } } }
+});
+</script>
+{% endblock %}

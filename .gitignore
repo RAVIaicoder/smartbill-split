@@ -1,0 +1,19 @@
+# Never upload these to GitHub
+
+# Python virtual environment (huge, and anyone can recreate it)
+venv/
+__pycache__/
+*.pyc
+
+# Your private database and secret keys
+instance/
+.env
+
+# Uploaded receipt images (personal data)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+
+# OS/editor clutter
+.vscode/
+.DS_Store
+Thumbs.db

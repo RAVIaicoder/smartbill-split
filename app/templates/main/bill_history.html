@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Bill History — SmartBill Split{% endblock %}
+{% block content %}
+<div class="flex-between">
+  <h2>Bill history</h2>
+  <div style="display:flex; gap:8px;">
+    <a href="{{ url_for('main.export_bills', fmt='csv') }}" class="btn btn-outline btn-sm">Export CSV</a>
+    <a href="{{ url_for('main.export_bills', fmt='xlsx') }}" class="btn btn-outline btn-sm">Export Excel</a>
+    <a href="{{ url_for('main.export_bills', fmt='pdf') }}" class="btn btn-outline btn-sm">Export PDF</a>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <form method="GET" style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:12px; align-items:end;">
+    <div><label>Search</label><input type="text" name="q" value="{{ q }}" placeholder="Bill name..."></div>
+    <div>
+      <label>Category</label>
+      <select name="category">
+        <option value="">All</option>
+        {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if category_id == c.id }}>{{ c.icon }} {{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div><label>From</label><input type="date" name="from" value="{{ date_from or '' }}"></div>
+    <div><label>To</label><input type="date" name="to" value="{{ date_to or '' }}"></div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </form>
+</div>
+
+<div class="card mt-3" style="padding:0;">
+  <table class="table">
+    <tr><th>Bill</th><th>Group</th><th>Category</th><th>Amount</th><th>Paid by</th><th>Date</th><th>Status</th></tr>
+    {% for b in bills %}
+    <tr>
+      <td>{{ b.name }}</td>
+      <td>{{ b.group.name }}</td>
+      <td>{{ b.category.icon if b.category else '' }} {{ b.category.name if b.category else '—' }}</td>
+      <td>₹{{ "%.2f"|format(b.total_amount) }}</td>
+      <td>{{ b.paid_by.name }}</td>
+      <td>{{ b.bill_date }}</td>
+      <td>{% if b.is_fully_settled() %}<span class="pill pill-paid">Settled</span>{% else %}<span class="pill pill-pending">Pending</span>{% endif %}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="muted">No bills match your filters.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Admin — SmartBill Split{% endblock %}
+{% block content %}
+<h2>Admin overview</h2>
+<div class="grid-stats">
+  <div class="card stat-card"><div class="label">Total users</div><div class="value">{{ total_users }}</div></div>
+  <div class="card stat-card"><div class="label">Active users (7d)</div><div class="value">{{ active_users }}</div></div>
+  <div class="card stat-card"><div class="label">Total groups</div><div class="value">{{ total_groups }}</div></div>
+  <div class="card stat-card"><div class="label">Total bills</div><div class="value">{{ total_bills }}</div></div>
+  <div class="card stat-card receive"><div class="label">Payment volume settled</div><div class="value">₹{{ total_payment_volume }}</div></div>
+</div>
+<div style="display:flex; gap:10px;">
+  <a href="{{ url_for('admin.users') }}" class="btn btn-outline">Manage users</a>
+  <a href="{{ url_for('admin.groups') }}" class="btn btn-outline">View all groups</a>
+</div>
+{% endblock %}

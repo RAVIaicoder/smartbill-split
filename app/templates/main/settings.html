@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Settings — SmartBill Split{% endblock %}
+{% block content %}
+<h2>Settings</h2>
+<div class="card" style="max-width:480px;">
+  <form method="POST">
+    <label style="display:flex; align-items:center; gap:10px;">
+      <input type="checkbox" name="dark_mode" style="width:auto;" {{ 'checked' if current_user.dark_mode }}>
+      Dark mode
+    </label>
+    <label>Preferred currency</label>
+    <select name="currency">
+      <option value="INR" {{ 'selected' if current_user.currency == 'INR' }}>₹ INR — Indian Rupee</option>
+      <option value="USD" {{ 'selected' if current_user.currency == 'USD' }}>$ USD — US Dollar</option>
+      <option value="EUR" {{ 'selected' if current_user.currency == 'EUR' }}>€ EUR — Euro</option>
+    </select>
+    <p class="muted" style="font-size:0.78rem;">Currency conversion for cross-currency groups is a planned feature — see README.</p>
+    <button type="submit" class="btn btn-primary mt-3">Save settings</button>
+  </form>
+</div>
+{% endblock %}

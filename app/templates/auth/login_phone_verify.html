@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Verify OTP — SmartBill Split{% endblock %}
+{% block guest_content %}
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-logo">🔐 Enter the code</div>
+    <div class="auth-sub">We sent a {{ 6 }}-digit code to <strong>{{ phone }}</strong>.</div>
+    <form method="POST">
+      <label>OTP code</label>
+      <input type="text" name="otp" inputmode="numeric" maxlength="6" required autofocus placeholder="123456">
+      <button type="submit" class="btn btn-primary btn-block mt-3">Verify & continue</button>
+    </form>
+    <p class="muted" style="margin-top:18px; font-size:0.85rem;">
+      <a href="{{ url_for('auth.login_phone_request') }}">← Use a different number</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
